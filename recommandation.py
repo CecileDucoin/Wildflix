@@ -18,7 +18,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 st.markdown("""<style> [data-testid='stAppViewContainer']{
-            background-color : #232846;}</style>""", unsafe_allow_html=True)
+            background-color : #232846;
+            color : white;}</style>""", unsafe_allow_html=True)
 
 st.image('imagewild.png', width = 100)
 titres_onglets = ['Bienvenue', 'Recommandation', 'Dashboard']
