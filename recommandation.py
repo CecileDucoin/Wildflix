@@ -317,9 +317,9 @@ with onglet3:
         st.warning('Les champs username et mot de passe doivent être remplis')
 
 
-    with onglet4:
-        st.write('Horaires et accès')
-        st.image('plan.jpg', width = 400)
+    #with onglet4:
+       # st.write('Horaires et accès')
+       # st.image('plan.jpg', width = 400)
 
 
 
