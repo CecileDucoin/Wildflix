@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy
 from streamlit_authenticator import Authenticate
 import plotly.express as px
+import plotly.graph_objects as go
+
 
 st.set_page_config(
     page_title="Wildflix",
@@ -17,13 +19,13 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 st.markdown("""<style> [data-testid='stAppViewContainer']{
-            background-color : #232846;
-            color : white;}</style>""", unsafe_allow_html=True)
+            background-color : #232846;}</style>""", unsafe_allow_html=True)
 
 st.image('imagewild.png', width = 100)
-titres_onglets = ['Bienvenue', 'Recommandation', 'Dashboard']
-onglet1, onglet2, onglet3 = st.tabs(titres_onglets)
+titres_onglets = ['Bienvenue', 'Recommandation', 'Dashboard', 'Horaires et accès']
+onglet1, onglet2, onglet3, onglet4= st.tabs(titres_onglets)
 
 with onglet1:
     st.write('Bienvenue sur la page Wildflix :sunglasses: :popcorn:')
@@ -139,92 +141,126 @@ with onglet3:
         average_imdb_score_per_decade = movies_complet.groupby('decade')['imdb_score'].mean()
         col1, col2 = st.columns(2)  # Créez 2 colonnes
         with col1:
-            # Crée un graphique à barres avec Seaborn et ajuste la taille
-            plt.figure(figsize=(4, 2))  # Réduit la taille de moitié
-            sns.barplot(x=average_imdb_score_per_decade.index, y=average_imdb_score_per_decade.values, color='grey')
-        # Ajoute des étiquettes et des titres
-            plt.xlabel('Décennie', color='black',fontsize=4)
-            plt.ylabel('Score IMDb moyen', color='black',fontsize=4)
-            plt.title('Notation moyenne par décennie', color='black',fontsize=6,fontweight='bold')
-            plt.xticks(fontsize=4)
-            plt.yticks(fontsize=4)
-        # Supprimer le contour par défaut
-            plt.gca().spines['top'].set_visible(False)
-            plt.gca().spines['right'].set_visible(False)
-            plt.gca().spines['bottom'].set_visible(False)
-            plt.gca().spines['left'].set_visible(False)
-            plt.gca().set_facecolor('#FAFAD2')
-        # Affiche le graphique sur Streamlit
-            st.set_option('deprecation.showPyplotGlobalUse', False)
-            st.pyplot()
+        # Suppose you have a DataFrame called 'movies_complet' with columns 'decade' and 'imdb_score'
+
+            average_imdb_score_per_decade = movies_complet.groupby('decade')['imdb_score'].mean().reset_index()
+
+            fig = px.bar(average_imdb_score_per_decade, x='decade', y='imdb_score', color_discrete_sequence=['green'])
+            fig.update_layout(
+            xaxis_title='Décennie',
+            yaxis_title='Score IMDb moyen',
+            title='Score IMDb moyen par décennie',
+            #xaxis=dict(tickangle=90),
+            font=dict(color='white')
+            )
+
+            # To change the background color:
+            fig.update_layout(
+            plot_bgcolor='#232642'
+            )
+
+            # To change the font color:
+            fig.update_layout(
+            font=dict(color='white')
+            )
+
+            st.plotly_chart(fig)
         with col2:
             average_rating_per_couple = movies_complet.groupby('couple_director_actor_1')['imdb_score'].mean()
-        #average_rating_per_couple
-        # Tri décroissant
+            #average_rating_per_couple
+            # Tri décroissant
             average_rating_per_couple_sorted = average_rating_per_couple.sort_values(ascending=False)
-        # Création du graphique pour afficher le couple Top 10
-            plt.figure(figsize=(4, 2))
-            plt.barh(average_rating_per_couple_sorted.index[:10], average_rating_per_couple_sorted.values[:10], color = 'pink')  # Affichage du top 10 couplle
-            plt.xlabel('Average Rating', color = "purple",fontsize=4)
-            plt.ylabel('Couple Director - Actor',color = "purple",fontsize=4)
-            plt.title('Couple Director - Actor (Top 10)', color = "purple", fontsize=6,fontweight='bold')
-            plt.gca().spines['top'].set_visible(False)
-            plt.gca().spines['right'].set_visible(False)
-            plt.gca().spines['bottom'].set_visible(True)
-            plt.gca().spines['bottom'].set_color('purple')
-            plt.gca().spines['bottom'].set_linewidth(0.2)
-            plt.gca().spines['left'].set_visible(True)
-            plt.gca().spines['left'].set_color('purple')
-            plt.gca().spines['left'].set_linewidth(0.2)
-            plt.gca().set_facecolor('#FAFAD2')
-            plt.yticks(fontsize=4, color = "purple")
-            plt.xticks(fontsize=4, color = "purple")
-            plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
-            plt.tight_layout()
-            plt.show()
-            st.pyplot()
+            # Assuming your data is stored in pandas Dataframe named 'average_rating_per_couple_sorted'
+            # Prepare data for Plotly
+            couples = average_rating_per_couple_sorted.index[:10].tolist()
+            ratings = average_rating_per_couple_sorted.values[:10].tolist()
+            # Create the bar chart
+            fig = go.Figure(
+                data=[go.Bar(
+                    x=ratings,
+                    y=couples,
+                    text=ratings,
+                    textposition='auto',
+                    marker_color='pink',
+                    orientation='h'
+                )]
+            )
+            # Update layout for interactivity and styling
+            fig.update_layout(
+                title='Couple Director - Actor (Top 10)',
+                title_x=0.5,
+                title_font_color="white",
+                # title_font_weight="bold",  # Remove invalid property
+                title_font_size=16,  # Increase title font size for emphasis
+                #xaxis_title='Average Rating',
+                xaxis_title_font_color="white",
+                xaxis_title_font_size=15,
+                #yaxis_title='Couple Director - Actor',
+                yaxis_title_font_color="white",
+                yaxis_title_font_size=4,
+                xaxis_tickfont_color="white",
+                xaxis_tickfont_size=4,
+                yaxis_tickfont_color="white",
+                yaxis_tickfont_size=15,
+                xaxis_tickangle=45,
+                xaxis_tickvals=ratings,
+                plot_bgcolor='#232846',  # Set transparent white background
+                xaxis_showgrid=False,
+                yaxis_showgrid=False
+            )
+            #fig.show()
+            st.plotly_chart(fig)
+
         col1, col2 = st.columns(2)  # Créez 2 colonnes
         with col1:
             df_select_genre = pd.read_csv('df_imdbscore_moyen_par_genre.csv')
-        # Sélection du genre à partir d'un input
-            select_genre = st.selectbox("Select a column for the line chart:", df_select_genre['genre'])
-        # Filtrage du dataframe pour ne garder que les films du genre sélectionné
+            select_genre = st.selectbox("Sélectionnez une colonne pour le graphique en ligne :", df_select_genre['genre'])
+
+            # Filtrage du dataframe pour ne garder que les films du genre sélectionné
             df_genre = df_select_genre[df_select_genre['genre'] == select_genre]
-        #Create the barplot using Seaborn
-            plt.figure(figsize=(5, 3))
-            sns.barplot(x=df_genre['decade'], y=df_genre['imdb_score'], color = '#BDB76B')
-            plt.xlabel('decade',fontsize=4)
-            plt.ylabel('imdb_score',fontsize=4)
-            plt.title(f'Notation moyenne par decennie du genre : {select_genre} ',fontsize=6,fontweight='bold')
-            plt.xticks(fontsize=4)
-            plt.yticks(fontsize=4)
-            plt.gca().spines['top'].set_visible(False)
-            plt.gca().spines['right'].set_visible(False)
-            plt.gca().spines['bottom'].set_visible(False)
-            plt.gca().spines['left'].set_visible(False)
-            plt.gca().set_facecolor('#FAFAD2')
-            plt.tight_layout()
-            plt.show()
-            st.pyplot()
+
+            fig = px.bar(df_genre, x='decade', y='imdb_score', color_discrete_sequence=['#BDB76B'])
+            fig.update_layout(
+                xaxis_title='Décennie',
+                yaxis_title='Score IMDb moyen',
+                title=f'Notation moyenne par décennie du genre : {select_genre}',
+                font=dict(color='white')
+            )
+
+            # To change the background color:
+            fig.update_layout(
+                plot_bgcolor='#232846'
+            )
+
+            st.plotly_chart(fig)
         with col2:
-    #Durée moyenne par genre
-            df_genre = movies_complet['genres'].str.split('|', expand=True).stack().reset_index(level=0).set_index('level_0').rename(columns={0:'genre'}) #Extract genres into a single column DataFrame
+        #Durée moyenne par genre
+            df_genre = movies_complet['genres'].str.split('|', expand=True).stack().reset_index(level=0).set_index('level_0').rename(columns={0:'genre'})
+
+            # Join the 'duration' column
             df_duree_moyenne_per_genre = df_genre.join(movies_complet['duration'])
             df_duree_moyenne_per_genre['duration'] = pd.to_numeric(df_duree_moyenne_per_genre['duration'], errors='coerce')
-            df_duree_moyenne_per_genre = df_duree_moyenne_per_genre.groupby('genre')['duration'].mean().reset_index().sort_values(by='duration', ascending=False) # Reset index to convert to DataFrame
-            g=sns.catplot(x="duration", y='genre', data=df_duree_moyenne_per_genre, kind='bar',color='orange',height=2)#, order=nb_votes_par_genre.index) # Use the DataFrame here
-            g.ax.set_xticklabels(g.ax.get_xticklabels(), fontsize=2)  # Rotate x-axis labels and reduce font size
-            g.ax.set_yticklabels(g.ax.get_yticklabels(), fontsize=2)
-            g.set_axis_labels("Durée en minutes", "",fontsize=2)
-            plt.title("Durée moyenne des films par genre", color='black',fontsize=4,fontweight='bold')
-            plt.gca().set_facecolor('#FAFAD2')
-            plt.tight_layout()  # Adjust layout to prevent labels from overlapping
-            plt.show()
-            st.pyplot()
 
-            #Affichage du top 5 des pays producteurs de films pour chaque decade
-        # Ouverture du dataframe enregistrer au format csv
-    
+            # Calculate average duration per genre
+            df_duree_moyenne_per_genre = df_duree_moyenne_per_genre.groupby('genre')['duration'].mean().reset_index().sort_values(by='duration', ascending=False)
+
+            fig = px.bar(df_duree_moyenne_per_genre, x='duration', y='genre', color_discrete_sequence=['orange'])
+            fig.update_layout(
+                xaxis_title='Durée en minutes',
+                yaxis_title='',
+                title='Durée moyenne des films par genre',
+                font=dict(color='white'),
+                plot_bgcolor='#232846',
+                height=550
+            )
+
+        
+            st.plotly_chart(fig)
+
+
+
+
+
         top_5_by_decade = pd.read_csv('top_5_by_decade.csv')
         # Group by country and decade
         grouped_by_country_decade = movies_complet.groupby(['country', 'decade'])
@@ -236,6 +272,7 @@ with onglet3:
         var_name='decade',
         value_name='nb_film'
         )
+        
         # Filter les lignes dont le nb_film != 0 avant tri et selection du top 5
         top_5_by_decade = nb_films_by_country_per_decade[nb_films_by_country_per_decade['nb_film'] > 0]
         # Tri par decade et sélection du top 5
@@ -246,32 +283,29 @@ with onglet3:
         st.title('Top 5 des pays producteurs de films par décennies')
         # Affichage de la carte
         fig = px.scatter_geo(top_5_by_decade,
-                locations='country',
-                locationmode='country names',
-                color='country',
-                hover_data=['country', 'nb_film'], # Use hover_data to display multiple columns
-                size='nb_film',
-                animation_frame='decade',
-                projection='natural earth'
-                )
+                     locations='country',
+                     locationmode='country names',
+                     color='country',
+                     hover_data=['country', 'nb_film'],  # Utilisation de hover_data pour afficher plusieurs colonnes
+                     size='nb_film',
+                     animation_frame='decade',
+                     projection='natural earth'
+                     )
+
+        # Modifier le fond de la carte et les contours
+        fig.update_geos(
+            bgcolor='#232846',
+            showcoastlines=True, coastlinecolor='white',
+            showland=True, landcolor='#232846',
+            showocean=True, oceancolor='#232846',
+            showlakes=True, lakecolor='#232846',
+            showrivers=True, rivercolor='white'
+        )
+
         st.plotly_chart(fig)
+
+       
         
-        sns.regplot(x = 'gross', y= 'imdb_score', data = movies_complet)
-        plt.xlabel('Budget',fontsize=4)
-        plt.ylabel('Score IMDb',fontsize=4)
-        plt.title('Budget et notation', color='black',fontsize=6,fontweight='bold')
-        plt.xticks(fontsize=4)
-        plt.yticks(fontsize=4)
-        plt.gca().spines['top'].set_visible(False)
-        plt.gca().spines['right'].set_visible(False)
-        plt.gca().spines['bottom'].set_visible(True)
-        plt.gca().spines['left'].set_visible(True)
-        plt.gca().set_facecolor('#FAFAD2')
-        plt.gca().spines['left'].set_color('blue')
-        plt.gca().spines['left'].set_linewidth(0.2)
-        plt.gca().spines['bottom'].set_color('blue')
-        plt.gca().spines['bottom'].set_linewidth(0.2)
-        st.pyplot()
 
     if st.session_state["authentication_status"]:
         accueil()
@@ -281,6 +315,28 @@ with onglet3:
         st.error("L'username ou le password est/sont incorrect")
     elif st.session_state["authentication_status"] is None:
         st.warning('Les champs username et mot de passe doivent être remplis')
+
+
+    with onglet4:
+        st.write('Horaires et accès')
+        st.image('plan.jpg', width = 400)
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+
 
 
 
