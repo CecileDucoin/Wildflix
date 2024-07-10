@@ -256,7 +256,7 @@ with onglet3:
             select_genre = st.selectbox("Sélectionnez un genre :", df_select_genre['genre'])
             # Filtrage du dataframe pour ne garder que les films du genre sélectionné
             df_genre = df_select_genre[df_select_genre['genre'] == select_genre]
-            fig = px.bar(df_genre, x='decade', y='imdb_score', color_discrete_sequence=['darkseagreen'])
+            fig = px.bar(df_genre, x='decade', y='imdb_score', color_discrete_sequence=['seagreen'])
             fig.update_layout(
                 xaxis_title='Décennie',
                 yaxis_title='Score IMDb moyen',
@@ -287,7 +287,7 @@ with onglet3:
             df_duree_moyenne_per_genre['duration'] = pd.to_numeric(df_duree_moyenne_per_genre['duration'], errors='coerce')
             # Calculate average duration per genre
             df_duree_moyenne_per_genre = df_duree_moyenne_per_genre.groupby('genre')['duration'].mean().reset_index().sort_values(by='duration', ascending=False)
-            fig = px.bar(df_duree_moyenne_per_genre, x='duration', y='genre', color_discrete_sequence=['seagreen'])
+            fig = px.bar(df_duree_moyenne_per_genre, x='duration', y='genre', color_discrete_sequence=['darkseagreen'])
             fig.update_layout(
                 xaxis_title='Durée en minutes',
                 yaxis_title='',
