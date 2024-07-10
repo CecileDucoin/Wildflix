@@ -253,7 +253,7 @@ with onglet3:
         col1, col2 = st.columns(2)  # Créez 2 colonnes
         with col1:
             df_select_genre = pd.read_csv('df_imdbscore_moyen_par_genre.csv')
-            select_genre = st.selectbox("Sélectionnez une colonne pour le graphique en ligne :", df_select_genre['genre'])
+            select_genre = st.selectbox("Sélectionnez un genre :", df_select_genre['genre'])
             # Filtrage du dataframe pour ne garder que les films du genre sélectionné
             df_genre = df_select_genre[df_select_genre['genre'] == select_genre]
             fig = px.bar(df_genre, x='decade', y='imdb_score', color_discrete_sequence=['#BDB76B'])
